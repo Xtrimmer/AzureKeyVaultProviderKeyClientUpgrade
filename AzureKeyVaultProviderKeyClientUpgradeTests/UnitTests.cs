@@ -14,6 +14,7 @@ namespace AzureKeyVaultProviderKeyClientUpgradeTests
         const string MasterKeyPath = "<KeyVaultIdentifierURI>";
         const string ClientId = "<AzureClientId>";
         const string ClientSecret = "<AzureClientSecret>";
+        const string TenantId = "<TenantId>";
         public static readonly byte[] ColumnEncryptionKey = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
 
 
@@ -30,7 +31,7 @@ namespace AzureKeyVaultProviderKeyClientUpgradeTests
         [Fact]
         public void TokenCredentialWorks()
         {
-            ColumnEncryptionAzureKeyVaultProvider akvProvider = new ColumnEncryptionAzureKeyVaultProvider(new DefaultAzureCredential());
+            ColumnEncryptionAzureKeyVaultProvider akvProvider = new ColumnEncryptionAzureKeyVaultProvider(new ClientSecretCredential(TenantId, ClientId, ClientSecret));
             byte[] encryptedCek = akvProvider.EncryptColumnEncryptionKey(MasterKeyPath, EncryptionAlgorithm, ColumnEncryptionKey);
             byte[] decryptedCek = akvProvider.DecryptColumnEncryptionKey(MasterKeyPath, EncryptionAlgorithm, encryptedCek);
 
@@ -40,7 +41,7 @@ namespace AzureKeyVaultProviderKeyClientUpgradeTests
         [Fact]
         public void IsCompatibleWithProviderUsingLegacyClient()
         {
-            ColumnEncryptionAzureKeyVaultProvider newAkvProvider = new ColumnEncryptionAzureKeyVaultProvider(new DefaultAzureCredential());
+            ColumnEncryptionAzureKeyVaultProvider newAkvProvider = new ColumnEncryptionAzureKeyVaultProvider(new ClientSecretCredential(TenantId, ClientId, ClientSecret));
             SqlColumnEncryptionAzureKeyVaultProvider oldAkvProvider = new SqlColumnEncryptionAzureKeyVaultProvider(AzureActiveDirectoryAuthenticationCallback);
 
             byte[] encryptedCekWithNewProvider = newAkvProvider.EncryptColumnEncryptionKey(MasterKeyPath, EncryptionAlgorithm, ColumnEncryptionKey);
