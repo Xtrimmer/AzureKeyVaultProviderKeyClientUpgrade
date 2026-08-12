@@ -1,0 +1,30 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore AzureKeyVaultProviderKeyClientUpgrade.sln
+
+      - name: Build
+        run: dotnet build AzureKeyVaultProviderKeyClientUpgrade.sln --configuration Release --no-restore
+
+      # Tests are deliberately not run here. UnitTests.cs authenticates against a
+      # real Azure Key Vault with a tenant id, client id and client secret, so it
+      # cannot execute without credentials. This workflow verifies that the
+      # solution restores and compiles.
